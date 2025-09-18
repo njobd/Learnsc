@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.2",
+    "@upstash/redis": "^1.20.0",
+    "esbuild": "^0.25.9",
+    "node-fetch": "^2.6.9"
+  },
+  "scripts": {
+    "build": "node build/build.js",
+    "prebuild": "mkdir -p dist",
+    "start": "echo 'No local dev server configured; use Netlify CLI (npx netlify dev)'"
+  }
+}

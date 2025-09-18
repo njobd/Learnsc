@@ -1,0 +1,7 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.upstash.io; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; base-uri 'self'; form-action 'self'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
