@@ -1,0 +1,69 @@
+// src/bootstrap.js
+import { createClient } from "@supabase/supabase-js";
+
+/*
+  Robust env resolution:
+  1) Try Vite-style import.meta.env.VITE_*
+  2) Fall back to process.env.* (this works if you used esbuild.define to inject at build time)
+  3) Fall back to runtime global window.SUPABASE_* (useful if you set globals on the page)
+*/
+
+function getEnvVar(nameVariants) {
+  // nameVariants: [{vite: 'VITE_*', proc: 'SUPABASE_*', win: 'SUPABASE_*'}]
+  let val;
+
+  // 1) import.meta.env (Vite) - use try/catch to avoid ReferenceError if import.meta isn't supported
+  try {
+    if (typeof import !== 'undefined' && import.meta && import.meta.env) {
+      const key = nameVariants.vite;
+      val = import.meta.env[key];
+      if (val) return val;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 2) process.env.* — safe check using typeof (esbuild may have replaced tokens at build time)
+  try {
+    if (typeof process !== "undefined" && process.env) {
+      const key = nameVariants.proc;
+      val = process.env[key];
+      if (val) return val;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 3) window globals (runtime)
+  try {
+    if (typeof window !== "undefined") {
+      const key = nameVariants.win;
+      val = window[key];
+      if (val) return val;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return undefined;
+}
+
+const supabaseUrl = getEnvVar({ vite: "VITE_SUPABASE_URL", proc: "SUPABASE_URL", win: "SUPABASE_URL" });
+const supabaseKey = getEnvVar({ vite: "VITE_SUPABASE_ANON_KEY", proc: "SUPABASE_ANON_KEY", win: "SUPABASE_ANON_KEY" });
+
+// Helpful debugging logs (remove in production)
+if (!supabaseUrl || !supabaseKey) {
+  console.error("❌ Supabase client not initialized. Missing environment variables.");
+  console.error("supabaseUrl resolved to:", supabaseUrl);
+  console.error("supabaseKey exists?:", !!supabaseKey);
+} else {
+  // Create the client (and attach to window for backward compatibility)
+  window.supabase = createClient(supabaseUrl, supabaseKey);
+  console.log("✅ Supabase initialized:", supabaseUrl);
+}
+
+// helper exports if other modules prefer import
+export function getSupabase() {
+  if (!window.supabase) throw new Error("Supabase client not initialized — check env variables.");
+  return window.supabase;
+}
