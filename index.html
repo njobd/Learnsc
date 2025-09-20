@@ -2709,7 +2709,7 @@
 
         <script type="module" src="/src/main.js"></script>
      
-   <!-- Notification container -->
+   <!-- Enhanced Notification System -->
 <div id="notify" style="
   position: fixed;
   bottom: 20px;
@@ -2723,63 +2723,242 @@
   font-size: 14px;
   display: none;
   z-index: 9999;
+  max-width: 400px;
+  white-space: pre-line;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 "></div>
 
+<!-- Connection Status Indicator -->
+<div id="connectionStatus" style="
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #ffeb3b;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: none;
+  z-index: 9999;
+">
+  Checking connection...
+</div>
+
 <script type="module">
-  function showNotification(message, isError = true) {
+  let connectionCheckInterval;
+  
+  function showNotification(message, isError = true, duration = 6000) {
     const box = document.getElementById("notify");
     box.textContent = message;
     box.style.display = "block";
-    box.style.background = isError ? "#ffdddd" : "#ddffdd";
-    box.style.color = isError ? "#a30000" : "#006600";
-    box.style.borderColor = isError ? "#a30000" : "#006600";
+    
+    if (isError) {
+      box.style.background = "#ffdddd";
+      box.style.color = "#a30000";
+      box.style.borderColor = "#a30000";
+    } else {
+      box.style.background = "#ddffdd";
+      box.style.color = "#006600";
+      box.style.borderColor = "#006600";
+    }
 
     setTimeout(() => {
       box.style.display = "none";
-    }, 6000);
+    }, duration);
   }
 
-  // ✅ Wrap your custom login handler
-  async function handleCustomLogin(username, password) {
-    try {
-      if (!window.supabase) {
-        throw new Error("Supabase client not initialized. Check VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.");
-      }
+  function showConnectionStatus(message, type = 'warning') {
+    const status = document.getElementById("connectionStatus");
+    status.textContent = message;
+    status.style.display = "block";
+    
+    switch(type) {
+      case 'error':
+        status.style.background = "#ffdddd";
+        status.style.color = "#a30000";
+        break;
+      case 'success':
+        status.style.background = "#ddffdd";
+        status.style.color = "#006600";
+        break;
+      default:
+        status.style.background = "#ffeb3b";
+        status.style.color = "#333";
+    }
 
-      // Replace this with your existing Supabase call logic
-      const { data, error } = await window.supabase
-        .from("users")
-        .select("*")
-        .eq("username", username)
-        .eq("password", password)
-        .single();
-
-      if (error || !data) {
-        throw new Error("Invalid username or password.");
-      }
-
-      showNotification(`✅ Welcome back, ${data.username}!`, false);
-    } catch (err) {
-      if (err.message.includes("Failed to fetch")) {
-        showNotification("❌ Network error: Could not reach Supabase.\nCheck:\n- VITE_SUPABASE_URL is correct\n- Netlify domain is added in Supabase CORS settings\n- HTTPS is used (not HTTP).");
-      } else {
-        showNotification(`❌ Login failed: ${err.message}`);
-      }
+    if (type === 'success') {
+      setTimeout(() => {
+        status.style.display = "none";
+      }, 3000);
     }
   }
 
-  // Hook up to your form
+  function hideConnectionStatus() {
+    document.getElementById("connectionStatus").style.display = "none";
+  }
+
+  async function checkSupabaseConnection() {
+    try {
+      // Check if Supabase client exists
+      if (!window.supabase) {
+        throw new Error("SUPABASE_NOT_INITIALIZED");
+      }
+
+      // Test connection with a simple query
+      const { data, error } = await window.supabase
+        .from('users')
+        .select('count')
+        .limit(1);
+
+      if (error) {
+        throw new Error(`SUPABASE_ERROR: ${error.message}`);
+      }
+
+      showConnectionStatus("Connected to Supabase", 'success');
+      return true;
+    } catch (err) {
+      let errorMessage = "Connection Error: ";
+      let suggestions = "";
+
+      if (err.message.includes("SUPABASE_NOT_INITIALIZED")) {
+        errorMessage += "Supabase client not found";
+        suggestions = "\n\nPossible fixes:\n• Check if main.js is loading\n• Verify VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY\n• Check browser console for errors";
+      } else if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+        errorMessage += "Network connection failed";
+        suggestions = "\n\nPossible fixes:\n• Check your internet connection\n• Verify Supabase project is active\n• Check if domain is whitelisted in Supabase\n• Ensure HTTPS is being used";
+      } else if (err.message.includes("CORS")) {
+        errorMessage += "CORS policy error";
+        suggestions = "\n\nFix: Add your domain to Supabase CORS settings";
+      } else if (err.message.includes("relation") && err.message.includes("does not exist")) {
+        errorMessage += "Database table missing";
+        suggestions = "\n\nFix: Create required database tables in Supabase";
+      } else {
+        errorMessage += err.message;
+        suggestions = "\n\nCheck browser console for more details";
+      }
+
+      showConnectionStatus("Connection Failed", 'error');
+      showNotification(errorMessage + suggestions, true, 10000);
+      return false;
+    }
+  }
+
+  // Enhanced login function with better error handling
+  async function handleEnhancedLogin(username, password) {
+    const loginBtn = document.querySelector('#loginForm button[type="submit"]');
+    const inputs = document.querySelectorAll('#loginForm input');
+    
+    try {
+      // Disable form during login attempt
+      loginBtn.textContent = "Signing In...";
+      loginBtn.disabled = true;
+      inputs.forEach(input => input.disabled = true);
+
+      // Check connection first
+      const isConnected = await checkSupabaseConnection();
+      if (!isConnected) {
+        throw new Error("CONNECTION_FAILED");
+      }
+
+      // Validate inputs
+      if (!username || username.length < 3) {
+        throw new Error("Username must be at least 3 characters long");
+      }
+      if (!password || password.length < 6) {
+        throw new Error("Password must be at least 6 characters long");
+      }
+
+      // Attempt login
+      const { data, error } = await window.supabase.rpc('login_user', {
+        _username: username.trim(),
+        _password: password
+      });
+
+      if (error) {
+        if (error.message.includes("function login_user") && error.message.includes("does not exist")) {
+          throw new Error("LOGIN_FUNCTION_MISSING: Database function 'login_user' not found.\n\nPlease ensure all database functions are created in Supabase.");
+        }
+        throw new Error(`LOGIN_RPC_ERROR: ${error.message}`);
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error("Invalid username or password.\n\nPlease check your credentials and try again.");
+      }
+
+      // Success
+      hideConnectionStatus();
+      showNotification(`Welcome back, ${data[0].username}!`, false);
+      
+      // Continue with your existing login success logic here
+      // currentUser = { ... }; 
+      // showApp();
+      
+    } catch (err) {
+      let userMessage = "";
+      
+      if (err.message === "CONNECTION_FAILED") {
+        userMessage = "Cannot connect to server. Please check your connection and try again.";
+      } else if (err.message.includes("LOGIN_FUNCTION_MISSING")) {
+        userMessage = err.message;
+      } else if (err.message.includes("Failed to fetch")) {
+        userMessage = "Network error occurred.\n\nPossible fixes:\n• Check internet connection\n• Refresh the page\n• Try again in a few moments";
+      } else if (err.message.includes("LOGIN_RPC_ERROR")) {
+        userMessage = `Login failed: ${err.message.replace("LOGIN_RPC_ERROR: ", "")}`;
+      } else {
+        userMessage = err.message;
+      }
+      
+      showNotification(userMessage, true);
+      console.error("Login error details:", err);
+      
+    } finally {
+      // Re-enable form
+      loginBtn.textContent = "Sign In";
+      loginBtn.disabled = false;
+      inputs.forEach(input => input.disabled = false);
+    }
+  }
+
+  // Initialize when page loads
   document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("login-form"); // make sure your form has this ID
-    if (form) {
-      form.addEventListener("submit", async (e) => {
+    // Show connection checking status
+    showConnectionStatus("Checking connection...");
+    
+    // Check connection after a short delay to allow scripts to load
+    setTimeout(() => {
+      checkSupabaseConnection();
+    }, 1000);
+
+    // Replace the existing login form handler
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const username = e.target.elements["username"].value;
-        const password = e.target.elements["password"].value;
-        await handleCustomLogin(username, password);
+        const username = document.getElementById("loginUsername").value;
+        const password = document.getElementById("loginPassword").value;
+        await handleEnhancedLogin(username, password);
       });
     }
+
+    // Periodic connection check (every 30 seconds)
+    connectionCheckInterval = setInterval(() => {
+      if (document.getElementById("connectionStatus").style.display !== "none") {
+        checkSupabaseConnection();
+      }
+    }, 30000);
   });
+
+  // Clean up interval when page unloads
+  window.addEventListener("beforeunload", () => {
+    if (connectionCheckInterval) {
+      clearInterval(connectionCheckInterval);
+    }
+  });
+
+  // Make functions globally available
+  window.showNotification = showNotification;
+  window.checkSupabaseConnection = checkSupabaseConnection;
 </script>
 
 </script>
