@@ -2708,45 +2708,7 @@
         </script>
 
         <script type="module" src="/src/main.js"></script>
-        <!-- Notification container -->
-<div id="notify" style="
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #ffdddd;
-  color: #a30000;
-  border: 1px solid #a30000;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-family: sans-serif;
-  font-size: 14px;
-  display: none;
-  z-index: 9999;
-"></div>
-
-<script type="module">
-  function showNotification(message, isError = true) {
-    const box = document.getElementById("notify");
-    box.textContent = message;
-    box.style.display = "block";
-    box.style.background = isError ? "#ffdddd" : "#ddffdd";
-    box.style.color = isError ? "#a30000" : "#006600";
-    box.style.borderColor = isError ? "#a30000" : "#006600";
-
-    // Auto-hide after 6 seconds
-    setTimeout(() => {
-      box.style.display = "none";
-    }, 6000);
-  }
-
-  // Example: Supabase init check
-  document.addEventListener("DOMContentLoaded", () => {
-    if (!window.supabase) {
-      showNotification("❌ Supabase client not initialized. Check your .env variables (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).");
-    } else {
-      showNotification("✅ Supabase client initialized successfully.", false);
-    }
-  });
+     
     <!-- Notification container -->
 <div id="notify" style="
   position: fixed;
