@@ -7,6 +7,9 @@ if (!supabaseUrl || !supabaseKey) {
   console.error("❌ Supabase client not initialized. Missing environment variables.");
   console.error("supabaseUrl resolved to:", supabaseUrl);
   console.error("supabaseKey exists?:", !!supabaseKey);
+  console.log("Supabase URL:", supabaseUrl);
+  console.log("Supabase Key exists:", !!supabaseKey);
+
 } else {
   window.supabase = createClient(supabaseUrl, supabaseKey);
   console.log("✅ Supabase initialized successfully");
