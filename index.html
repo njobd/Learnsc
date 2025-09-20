@@ -2709,7 +2709,7 @@
 
         <script type="module" src="/src/main.js"></script>
      
-    <!-- Notification container -->
+   <!-- Notification container -->
 <div id="notify" style="
   position: fixed;
   bottom: 20px;
@@ -2739,30 +2739,49 @@
     }, 6000);
   }
 
-  // Example advanced login handler
-  async function login(email, password) {
+  // ✅ Wrap your custom login handler
+  async function handleCustomLogin(username, password) {
     try {
-      const { data, error } = await window.supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      if (error) throw error;
+      if (!window.supabase) {
+        throw new Error("Supabase client not initialized. Check VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.");
+      }
 
-      showNotification("✅ Login successful!", false);
+      // Replace this with your existing Supabase call logic
+      const { data, error } = await window.supabase
+        .from("users")
+        .select("*")
+        .eq("username", username)
+        .eq("password", password)
+        .single();
+
+      if (error || !data) {
+        throw new Error("Invalid username or password.");
+      }
+
+      showNotification(`✅ Welcome back, ${data.username}!`, false);
     } catch (err) {
       if (err.message.includes("Failed to fetch")) {
-        showNotification("❌ Network error: Could not reach Supabase. Check:\n- VITE_SUPABASE_URL is correct\n- Netlify domain is allowed in Supabase CORS settings\n- Using HTTPS not HTTP");
+        showNotification("❌ Network error: Could not reach Supabase.\nCheck:\n- VITE_SUPABASE_URL is correct\n- Netlify domain is added in Supabase CORS settings\n- HTTPS is used (not HTTP).");
       } else {
         showNotification(`❌ Login failed: ${err.message}`);
       }
     }
   }
 
-  // Example trigger
-  document.addEventListener("DOMContentLoaded", function () => {
-    // Replace with your actual login form handling
-    // login("test@example.com", "password123");
+  // Hook up to your form
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("login-form"); // make sure your form has this ID
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = e.target.elements["username"].value;
+        const password = e.target.elements["password"].value;
+        await handleCustomLogin(username, password);
+      });
+    }
   });
+</script>
+
 </script>
 
 </script>
