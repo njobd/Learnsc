@@ -2815,7 +2815,7 @@
         throw new Error(`SUPABASE_ERROR: ${error.message}`);
       }
 
-      showConnectionStatus("Connected to Supabase", 'success');
+      showConnectionStatus("Connected", 'success');
       return true;
     } catch (err) {
       let errorMessage = "Connection Error: ";
