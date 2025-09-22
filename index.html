@@ -1373,10 +1373,7 @@
 
                     if (data && data.length > 0) {
                         const userDisplayId = data[0].display_id;
-                        showNotification(
-                            `Registration successful! Your user ID is: ${userDisplayId}`,
-                            "success",
-                        );
+showNotification(`Registration successful! Your user ID is: ${userDisplayId}`, false);
                         document.getElementById("registerForm").reset();
                         showLogin();
                     } else {
@@ -1626,9 +1623,7 @@
 
                     document.getElementById("friendUsername").value = "";
                     loadFriends();
-                    showNotification(
-                        `Added ${friendData[0].username} as a friend!`,
-                    );
+                    showNotification(`Added ${friendData[0].username} as a friend!`, false);
                 } catch (err) {
                     console.error("Add friend error:", err);
                     showNotification("Failed to add friend", "error");
@@ -1709,7 +1704,7 @@
                         document.body.classList.remove("chat-open");
                     }
 
-                    showNotification("Friend removed successfully");
+                    showNotification("Friend removed successfully", false);
                 } catch (err) {
                     console.error("Remove friend error:", err);
                     showNotification("Failed to remove friend", "error");
@@ -1993,9 +1988,7 @@
                     // Refresh conversations to show saved messages
                     loadLatestConversations();
 
-                    showNotification(
-                        `Saved ${savedCount} messages to permanent chat`,
-                    );
+                    showNotification(`Saved ${savedCount} messages to permanent chat`, false);
 
                     // Update save button state
                     updateSaveIndicator(friendId);
@@ -2693,7 +2686,7 @@
                 textArea.select();
                 try {
                     document.execCommand("copy");
-                    showNotification("Your user ID copied to clipboard!");
+                    showNotification("Your user ID copied to clipboard!", false);
                 } catch (err) {
                     showNotification("Failed to copy to clipboard", "error");
                 }
