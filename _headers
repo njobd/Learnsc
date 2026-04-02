@@ -1,6 +1,6 @@
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.upstash.io; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; base-uri 'self'; form-action 'self'
-  X-Frame-Options: DENY
+  X-Frame-Options: ALLOW-FROM https://fearless-yard-244286.framer.app/
   X-Content-Type-Options: nosniff
   Referrer-Policy: same-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=()
