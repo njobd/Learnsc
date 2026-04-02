@@ -18,6 +18,13 @@ exports.handler = async (event) => {
     return { statusCode: 204, headers: CORS_HEADERS, body: "" };
   }
 
+    const origin = event.headers.origin || "";
+  const allowedOrigin = process.env.ALLOW_ORIGIN;
+
+  if (allowedOrigin && origin !== allowedOrigin) {
+    return { statusCode: 403, headers: CORS_HEADERS, body: JSON.stringify({ error: "Forbidden" }) };
+  }
+
   try {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE;
     if (!serviceKey) {
