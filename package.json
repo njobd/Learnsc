@@ -1,18 +1,18 @@
 {
   "dependencies": {
-  "@supabase/supabase-js": "^2.57.4",
-  "@upstash/redis": "^1.20.0",
-  "node-fetch": "^2.6.9"
-},
+    "@supabase/supabase-js": "^2.57.4",
+    "@upstash/redis": "^1.20.0",
+    "node-fetch": "^2.6.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.3",
+    "vite": "^7.1.6"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "prebuild": "mkdir -p dist",
-    "start": "echo 'No local dev server configured; use Netlify CLI (npx netlify dev)'"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^5.0.3",
-    "vite": "^7.1.6"
+    "start": "echo 'Run: npx netlify dev'"
   }
 }
