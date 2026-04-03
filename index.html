@@ -1,81 +1,190 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>learnflow - Modern Messaging</title>
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ChatFlow - Modern Messaging</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
 
-    <!-- ── Auth Screen ─────────────────────────────────── -->
-    <div id="authContainer" class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h1 class="auth-title">learnflow</h1>
-          <p class="auth-subtitle">Sign in to start messaging</p>
+    <body>
+        <!-- Authentication Container -->
+        <div class="auth-container" id="authContainer">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1 class="auth-title">ChatFlow</h1>
+                    <p class="auth-subtitle">Connect with friends instantly</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="loginUsername"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input
+                            type="password"
+                            class="form-input"
+                            id="loginPassword"
+                            required
+                        />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Sign In
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="showRegister"
+                    >
+                        Create Account
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="hidden">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="registerUsername"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input
+                            type="password"
+                            class="form-input"
+                            id="registerPassword"
+                            required
+                        />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Create Account
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="showLogin"
+                    >
+                        Back to Login
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <form id="loginForm">
-          <div class="form-group">
-            <label class="form-label" for="loginUsername">Username</label>
-            <input
-              class="form-input"
-              id="loginUsername"
-              type="text"
-              placeholder="Enter your username"
-              autocomplete="username"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="loginPassword">Password</label>
-            <input
-              class="form-input"
-              id="loginPassword"
-              type="password"
-              placeholder="Enter your password"
-              autocomplete="current-password"
-              required
-            />
-          </div>
-          <button class="btn btn-primary" type="submit">Sign In</button>
-        </form>
-      </div>
-    </div>
+        <!-- Main App Container -->
+        <div class="app-container" id="appContainer">
+            <!-- Header -->
+            <header class="app-header">
+                <h1 class="app-title">ChatFlow</h1>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName"></div>
+                        <div
+                            class="user-id"
+                            id="userId"
+                            title="Click to copy your ID"
+                        ></div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
+                </div>
+            </header>
 
-    <!-- ── Main App ────────────────────────────────────── -->
-    <div id="appContainer" class="app-container">
-      <header class="app-header">
-        <span class="app-title">ChatFlow</span>
-        <div class="user-info">
-          <div class="user-details">
-            <span id="currentUsername"></span>
-          </div>
-          <button class="btn btn-secondary" id="logoutBtn" type="button">Sign Out</button>
+            <!-- Main Content -->
+            <div class="app-content">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-tabs">
+                        <div class="tab active" id="chatsTab">Chats</div>
+                        <div class="tab" id="friendsTab">Friends</div>
+                    </div>
+
+                    <div class="sidebar-content">
+                        <!-- Chats Tab Content -->
+                        <div id="chatsContent">
+                            <div id="chatsList"></div>
+                        </div>
+
+                        <!-- Friends Tab Content -->
+                        <div id="friendsContent" class="hidden">
+                            <form class="add-friend-form" id="addFriendForm">
+                                <input
+                                    type="text"
+                                    class="add-friend-input"
+                                    id="friendUsername"
+                                    placeholder="Enter friend's 6-character user ID"
+                                />
+                                <button type="submit" class="add-friend-btn">
+                                    Add Friend
+                                </button>
+                            </form>
+                            <div id="friendsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="chat-area">
+                    <div id="chatContent">
+                        <div class="empty-state">
+                            <div class="empty-icon">💬</div>
+                            <h3>Select a chat to start messaging</h3>
+                            <p>Choose a conversation from the sidebar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </header>
 
-      <main id="messagesContainer"></main>
+        <!-- Notification & Status overlays -->
+        <div id="notify" style="
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #ffdddd;
+          color: #a30000;
+          border: 1px solid #a30000;
+          padding: 12px 16px;
+          border-radius: 8px;
+          font-family: sans-serif;
+          font-size: 14px;
+          display: none;
+          z-index: 9999;
+          max-width: 400px;
+          white-space: pre-line;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        "></div>
 
-      <form id="messageForm">
-        <input
-          id="messageInput"
-          type="text"
-          placeholder="Type a message..."
-          autocomplete="off"
-          required
-        />
-        <button class="btn btn-primary" type="submit">Send</button>
-      </form>
-    </div>
+        <div id="connectionStatus" style="
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          background: #ffeb3b;
+          color: #333;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          display: none;
+          z-index: 9999;
+        ">Checking connection...</div>
 
-    <!-- ── Overlays ────────────────────────────────────── -->
-    <div id="notify"></div>
-    <div id="connectionStatus">Checking connection...</div>
+        <!-- Supabase client init (module, runs first) -->
+        <script type="module" src="/src/main.js"></script>
 
-    <!-- ── Scripts ────────────────────────────────────── -->
-    <script type="module" src="/src/main.js"></script>
+        <!-- App logic (deferred, runs after module) -->
+        <script src="/app.js" defer></script>
 
-  </body>
+    </body>
 </html>
